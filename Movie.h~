@@ -1,0 +1,17 @@
+#ifndef MOVIE_H
+#define MOVIE_H
+
+#include "DigitalMedia.h"
+
+class Movie : public DigitalMedia {
+private:
+    string director;
+    int duration;
+    float rating;
+
+public:
+    Movie(const string& title, const string& director, int year, int duration, float rating);
+    void display() const override;
+};
+
+#endif

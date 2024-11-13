@@ -1,0 +1,14 @@
+#include "VideoGame.h"
+#include <iostream>
+
+VideoGame::VideoGame(const string& title, int year, const string& publisher, float rating)
+    : DigitalMedia(title, year), publisher(publisher), rating(rating) {}
+
+float VideoGame::getRating() const {
+    return rating;
+}
+
+void VideoGame::display() const {
+    cout << "Video Game - Title: " << title << ", Year: " << year
+         << ", Publisher: " << publisher << ", Rating: " << rating << endl;
+}

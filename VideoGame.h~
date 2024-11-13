@@ -1,0 +1,17 @@
+#ifndef VIDEOGAME_H
+#define VIDEOGAME_H
+
+#include "DigitalMedia.h"
+
+class VideoGame : public DigitalMedia {
+private:
+    string publisher;
+    float rating;
+
+public:
+    VideoGame(const string& title, int year, const string& publisher, float rating);
+    float getRating() const;
+    void display() const override;
+};
+
+#endif

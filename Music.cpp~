@@ -1,0 +1,11 @@
+#include "Music.h"
+#include <iostream>
+
+Music::Music(const string& title, const string& artist, int year, int duration, const string& publisher)
+    : DigitalMedia(title, year), artist(artist), duration(duration), publisher(publisher) {}
+
+void Music::display() const {
+    cout << "Music - Title: " << title << ", Artist: " << artist
+         << ", Year: " << year << ", Duration: " << duration << " mins"
+         << ", Publisher: " << publisher << endl;
+}

@@ -1,0 +1,14 @@
+#include "DigitalMedia.h"
+#include <iostream>
+// Digital Media functions for the Classes project, Zach Russell 11/12/24
+DigitalMedia::DigitalMedia(const string& title, int year) : title(title), year(year) {}
+
+DigitalMedia::~DigitalMedia() {}
+
+string DigitalMedia::getTitle() const {
+    return title;
+}
+
+int DigitalMedia::getYear() const {
+    return year;
+}

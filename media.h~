@@ -1,0 +1,16 @@
+#include <iostream>
+#include <cstring>
+#include <vector>
+
+using namespace std;
+
+class Media {
+ public:
+  Media();
+  Media(char*);
+  char* getTitle();
+  int getYear();
+ private:
+  char* title;
+  int year;
+};

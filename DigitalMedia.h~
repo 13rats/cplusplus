@@ -1,0 +1,22 @@
+#ifndef DIGITALMEDIA_H
+#define DIGITALMEDIA_H
+
+#include <string>
+using namespace std;
+
+class DigitalMedia {
+protected:
+    string title;
+    int year;
+
+public:
+    DigitalMedia(const string& title, int year);
+    virtual ~DigitalMedia();
+
+    string getTitle() const;
+    int getYear() const;
+
+    virtual void display() const = 0;  // Pure virtual function to display details
+};
+
+#endif
