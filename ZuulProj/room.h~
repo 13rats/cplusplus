@@ -1,0 +1,19 @@
+#include <iostream>
+#include <cstring>
+#include <vector>
+#include <map>
+
+using namespace std;
+
+class room{
+ public:
+  room();
+  room(char*);
+  char* getName();
+  char* getDescription();
+  int getID();
+ private:
+  char* name;
+  char* description;
+  int id;
+}
