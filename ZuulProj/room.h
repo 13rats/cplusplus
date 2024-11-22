@@ -8,7 +8,7 @@ using namespace std;
 class room{
  public:
   room();
-  room(char*, char*, char*, char*, char*);
+  room(int, char*, char*, char*, int, char*, int, char*, int);
   char* getName();
   char* getDescription();
   int getID();
@@ -16,6 +16,9 @@ class room{
   char* exit1;
   char* exit2;
   char* exit3;
+  int loc1;
+  int loc2;
+  int loc3;
 
  private:
   char* name;
