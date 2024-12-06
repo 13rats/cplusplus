@@ -23,5 +23,5 @@ class room{
  private:
   char* name;
   char* description;
-  int id;
+  int id; 
 };
