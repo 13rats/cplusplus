@@ -10,11 +10,15 @@ Node::Node(Student* a){
 }
 
 Node::~Node(){
-  delete &stu;
+  delete stu;
   next = NULL;
 }
 
-Student* Node::getStudent(){
+void Node::setStu(Student* a){
+  stu = a;
+}
+
+Student* Node::getStu(){
   return stu;
 }
 
