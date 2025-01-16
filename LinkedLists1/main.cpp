@@ -9,33 +9,80 @@ Node* head;
 
 void add(Node* &head, Node* cur, Node* n);
 void print(Node* next);
+void del(Node* start, int passint);
 
 int main(){
+  bool mainLoop = true;
   Student* Stu1 = new Student(419746, 3.7, "Zach");
   Node* Znode = new Node(Stu1);
   Student* Stu2 = new Student(419744, 3.1, "Izzy");
   Node* Inode = new Node (Stu2);
   add(head, head, Znode);
   add(head, head, Inode);
-  print(head);
+  cout << "here" <<endl;
+  while (mainLoop == true){
+    char input[20];
+    for (int i = 0; i < 20; i++){
+      input[i] = '\n';
+    }
+    cout << "enter 'ADD' to add a student, enter 'PRINT' to print the list of students, enter 'DELETE' to remove a student, or enter 'QUIT to quit" << endl;
+    cin >> input;
+    cin.ignore();
+
+    if (strcmp(input, "ADD")== 0){
+      cout << "Enter the student's name" << endl;
+      cin >> input;
+      cin.ignore();
+      char name[20];
+      strcpy(name, input);
+      cout << "Enter the sudent's GPA" << endl;
+      float inpfloat = 1.23;
+      cin >> inpfloat;
+      cin.ignore();
+      cout << "Enter the student's ID number" << endl;
+      int inpint = -1;
+      cin >> inpint;
+      cin.ignore();
+      Student* s = new Student(inpint, inpfloat, name);
+      Node* n = new Node(s);
+      add(head, head, n);
+    }
+
+    else if (strcmp(input, "PRINT") == 0){
+      print(head);
+    }
+    
+    else if (strcmp(input, "DELETE") == 0){
+      int numberphone = -1;
+      cout << "enter the ID of the student you would like to remove" << endl;
+      cin >> numberphone;
+      if (numberphone != -1){
+	cout << "deleting " << numberphone << endl;        
+	del(head, numberphone);
+      }
+    }
+    else if (strcmp(input, "QUIT") == 0){
+      cout << "exiting program" << endl;
+      mainLoop = false;
+    }
+    else{
+      cout << input << endl;
+      cout << "unknown command" << endl;
+    }
+  }
+  return 0;
 }
 void add(Node* &head, Node* cur, Node* n){
   if (head == NULL) {
     head = n;
-    return;
   }
   else if((n->getStu())->getID() < (head->getStu())->getID()){
     n->setNext(head);
     head = n;
-    return;
   }
   else {
-    do ({
-	cur = cur->getNext();
-      });
-    while (((n->getStu())->getID() < (cur->getStu())->getID()));
+    
   }
-  add(head, cur->getNext(), n);
 }
 void print(Node* next){
   if (next == head){
@@ -45,5 +92,15 @@ void print(Node* next){
     Student* temp = next->getStu();
     temp->stuPrint();
     print(next->getNext());
+  }
+}
+void del(Node* s, int pasid){
+  cout << here << endl;
+  if ((s->getStu()->getID() == pasid)){
+    delete s;
+  }
+  else {
+    s = s->getNext();
+    del(s, pasid);
   }
 }
