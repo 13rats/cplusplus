@@ -2,105 +2,141 @@
 #include "node.h"
 #include "student.h"
 #include <cstring>
+#include <iomanip> // for the # of digits used in the GPA average
 
 using namespace std;
 
-Node* head;
+Node* head = nullptr; // start the head pointer as nullptr
 
-void add(Node* &head, Node* cur, Node* n);
+// prototypes
+void add(Node* &head, Node* n);
 void print(Node* next);
-void del(Node* start, int passint);
+void del(Node* &head, int passint);
+float calculateAverage(Node* next, int &count);
 
-int main(){
+int main() {
   bool mainLoop = true;
-  Student* Stu1 = new Student(419746, 3.7, "Zach");
-  Node* Znode = new Node(Stu1);
-  Student* Stu2 = new Student(419744, 3.1, "Izzy");
-  Node* Inode = new Node (Stu2);
-  add(head, head, Znode);
-  add(head, head, Inode);
-  cout << "here" <<endl;
-  while (mainLoop == true){
+
+  while (mainLoop) {
     char input[20];
-    for (int i = 0; i < 20; i++){
-      input[i] = '\n';
-    }
-    cout << "enter 'ADD' to add a student, enter 'PRINT' to print the list of students, enter 'DELETE' to remove a student, or enter 'QUIT to quit" << endl;
+    memset(input, '\0', 20);
+
+    cout << "Enter 'ADD', 'PRINT', 'DELETE', 'AVERAGE', or 'QUIT':" << endl;
     cin >> input;
-    cin.ignore();
 
-    if (strcmp(input, "ADD")== 0){
-      cout << "Enter the student's name" << endl;
-      cin >> input;
-      cin.ignore();
-      char name[20];
-      strcpy(name, input);
-      cout << "Enter the sudent's GPA" << endl;
-      float inpfloat = 1.23;
+    if (strcmp(input, "ADD") == 0) {
+      // takes in student info
+      char firstName[20], lastName[20];
+      cout << "Enter the student's first name:" << endl;
+      cin >> firstName;
+
+      cout << "Enter the student's last name:" << endl;
+      cin >> lastName;
+
+      char fullName[40];
+      strcpy(fullName, firstName);
+      strcat(fullName, " "); // adding space between 1st and last name
+      strcat(fullName, lastName);
+      cout << "Enter the student's GPA:" << endl;
+      float inpfloat;
       cin >> inpfloat;
-      cin.ignore();
-      cout << "Enter the student's ID number" << endl;
-      int inpint = -1;
-      cin >> inpint;
-      cin.ignore();
-      Student* s = new Student(inpint, inpfloat, name);
-      Node* n = new Node(s);
-      add(head, head, n);
-    }
 
-    else if (strcmp(input, "PRINT") == 0){
+      cout << "Enter the student's ID number:" << endl;
+      int inpint;
+      cin >> inpint;
+	    
+      // Create the new student and node
+      Student* s = new Student(inpint, inpfloat, fullName);
+      Node* n = new Node(s);
+
+      // Add the new node to the list
+      add(head, n);
+    }
+    else if (strcmp(input, "PRINT") == 0) {
+      // Print the list
       print(head);
     }
-    
-    else if (strcmp(input, "DELETE") == 0){
-      int numberphone = -1;
-      cout << "enter the ID of the student you would like to remove" << endl;
+    else if (strcmp(input, "DELETE") == 0) {
+      cout << "Enter the ID of the student you would like to remove:" << endl;
+      int numberphone;
       cin >> numberphone;
-      if (numberphone != -1){
-	cout << "deleting " << numberphone << endl;        
-	del(head, numberphone);
+
+      // Delete the node
+      del(head, numberphone);
+    }
+    else if (strcmp(input, "AVERAGE") == 0) {
+      // fidn the gpa avg
+      int count = 0;
+      float avg = calculateAverage(head, count);
+      if (count > 0) {
+	cout << "Average GPA: " << fixed << setprecision(2) << avg << endl;
+      } else {
+	cout << "No students in the list." << endl;
       }
     }
-    else if (strcmp(input, "QUIT") == 0){
-      cout << "exiting program" << endl;
+    else if (strcmp(input, "QUIT") == 0) {
+      cout << "Exiting program." << endl;
       mainLoop = false;
     }
-    else{
-      cout << input << endl;
-      cout << "unknown command" << endl;
+    else {
+      cout << "Unknown command: " << input << endl;
     }
   }
+
   return 0;
 }
-void add(Node* &head, Node* cur, Node* n){
-  if (head == NULL) {
-    head = n;
-  }
-  else if((n->getStu())->getID() < (head->getStu())->getID()){
+
+// add a node, sort by ID
+void add(Node* &head, Node* n) {
+  if (head == nullptr || n->getStu()->getID() < head->getStu()->getID()) {
     n->setNext(head);
     head = n;
+    return;
   }
-  else {
-    
-  }
+  Node* next = head->getNext();
+  add(next, n);
+  head->setNext(next);
 }
-void print(Node* next){
-  if (next == head){
-    cout << "list: ";
+
+// print the list
+void print(Node* next) {
+  if (next == nullptr) {
+    return;
   }
-  if (next != NULL){
-    Student* temp = next->getStu();
-    temp->stuPrint();
-    print(next->getNext());
-  }
+
+  Student* temp = next->getStu();
+  cout << temp->getName() << ", " << temp->getID() << ", " 
+       << fixed << setprecision(2) << temp->getGPA() << endl;
+
+  print(next->getNext());
 }
-void del(Node* s, int pasid){
-  cout << here << endl;
-  if ((s->getStu()->getID() == pasid)){
-    delete s;
+
+// delete a node by ID
+void del(Node* &head, int passint) {
+  if (head == nullptr) {
+    cout << "Student with ID " << passint << " not found." << endl;
+    return;
   }
-  else {
-    s = s->getNext();
-    del(s, pasid);
+
+  if (head->getStu()->getID() == passint) {
+    Node* temp = head;
+    head = head->getNext();
+    delete temp;
+    cout << "Student with ID " << passint << " deleted." << endl;
+    return;
   }
+
+  Node* next = head->getNext();
+  del(next, passint);
+  head->setNext(next);
+}
+
+// calculate the GPA average
+float calculateAverage(Node* next, int &count) {
+  if (next == nullptr) {
+    return 0.0;
+  }
+
+  count++;
+  return next->getStu()->getGPA() + calculateAverage(next->getNext(), count);
 }
