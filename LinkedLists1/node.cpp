@@ -1,17 +1,16 @@
 #include "node.h"
 Node::Node(){
   stu = new Student;
-  next = NULL;
+  next = nullptr;
 }
 
 Node::Node(Student* a){
   stu = a;
-  next = NULL;
+  next = nullptr;
 }
 
 Node::~Node(){
-  delete &stu;
-  next = NULL;
+  next = nullptr;
 }
 
 void Node::setStu(Student* a){
