@@ -28,6 +28,8 @@ int main(){
   ifstream lastF("last.txt");
 
   for (int i = 0; i < 100; i++){
+    FIRST[i] = new char[20];
+    LAST[i] = new char[20];
     firstF >> FIRST[i];
     lastF >> LAST[i];
   }
@@ -94,6 +96,7 @@ int main(){
   }
   return 0;
 }
+
 void add(Node** HashT, int BIGNUM, Node* n){
   Student* temp = n->getStu();
   int identity = temp->getID();
@@ -200,9 +203,8 @@ void random(int passcount, Node** HashT, int BIGNUM, char** FIRST, char** LAST){
     lname = LAST[lint];
     
     strcat(fname, lname);
-    strcpy(fname, name);
     
-    Student* s = new Student(i, gpa, name);
+    Student* s = new Student(i, gpa, fname);
     Node* n = new Node(s);
     add(HashT, BIGNUM, n);
   }
