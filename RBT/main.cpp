@@ -31,37 +31,46 @@ int main() {
             cin >> inpint;
             if (inpint >= 1 && inpint <= 999) {
                 add(head, inpint);
-            } else {
+            }
+	    else {
                 cout << "number must be between 1 and 999" << endl;
             }
-        } else if (input == "print") {
+        }
+	else if (input == "print") {
             if (head) {
                 print(head, 0);
-            } else {
+            }
+	    else {
                 cout << "nothing to print :( " << endl;
             }
-        } else if (input == "search") {
+        }
+	else if (input == "search") {
             cout << "enter number to search: ";
             int temp;
             cin >> temp;
             if (search(head, temp)) {
                 cout << "number found :0" << endl;
-            } else {
+            }
+	    else {
                 cout << "number lost :(((" << endl;
             }
-        } else if (input == "remove") {
+        }
+	else if (input == "remove") {
             cout << "enter the number to remove: ";
             int temp;
             cin >> temp;
             remove(head, temp);
-        } else if (input == "read") {
+        }
+	else if (input == "read") {
             cout << "Enter filename: ";
             string filename;
             cin >> filename;
             read(head, filename);
-        } else if (input == "quit") {
+        }
+	else if (input == "quit") {
             mainloop = false;
-        } else {
+        }
+	else {
             cout << "Invalid command" << endl;
         }
     }
@@ -79,7 +88,8 @@ void add(Node* &head, int i) {
         y = x;
         if (i < x->getValue()) {
             x = x->getLeft();
-        } else {
+        }
+	else {
             x = x->getRight();
         }
     }
@@ -87,9 +97,11 @@ void add(Node* &head, int i) {
     n->setParent(y);
     if (y == nullptr) {
         head = n;
-    } else if (i < y->getValue()) {
+    }
+    else if (i < y->getValue()) {
         y->setLeft(n);
-    } else {
+    }
+    else {
         y->setRight(n);
     }
 
@@ -108,7 +120,8 @@ void read(Node* &head, const string& filename) {
     while (file >> num) {
         if (num >= 1 && num <= 999) {
             add(head, num);
-        } else {
+        }
+	else {
             cout << "skipping invalid number: " << num << endl;
         }
     }
@@ -157,7 +170,8 @@ bool search(Node* head, int i) {
     while (x != nullptr && i != x->getValue()) {
         if (i < x->getValue()) {
             x = x->getLeft();
-        } else {
+        }
+	else {
             x = x->getRight();
         }
     }
@@ -170,7 +184,8 @@ void remove(Node* &head, int i) {
     while (z != nullptr && z->getValue() != i) {
         if (i < z->getValue()) {
             z = z->getLeft();
-        } else {
+        }
+	else {
             z = z->getRight();
         }
     }
@@ -182,81 +197,62 @@ void remove(Node* &head, int i) {
 
     Node* y = z;
     bool yOriginalColor = y->getColor();
-    Node* x = nullptr;
+    Node* x;
+    bool fixTree = true;//ADDED, YOU KNOW YOU LOVE BOOLEANS
 
     if (!z->hasLeft()) {
         x = z->getRight();
         transplant(head, z, z->getRight());
-    } else if (!z->hasRight()) {
+    }
+    else if (!z->hasRight()) {
         x = z->getLeft();
         transplant(head, z, z->getLeft());
-    } else {
+    }
+    else {
         y = z->getRight();
         while (y->hasLeft()) {
             y = y->getLeft();
         }
         yOriginalColor = y->getColor();
         x = y->getRight();
-        
-        if (y->getParent() == z) {
-            if (x) {
-                x->setParent(y);
-            }
-        } else {
+	if (!y->getRight() && !y->getLeft()) {//THIS IS THE CHECK TO SEE IF WE NEED TO FIX TREE EARLY
+	  fixTree = false;
+	  fixDelete(head, y);
+	}//THIS ENDS THE CHECK TO SEE IF WE FIX EARLY
+	if (y->getParent() == z) {
+            if (x) x->setParent(y);
+        }
+	else {
             transplant(head, y, y->getRight());
-            y->setRight(z->getRight());
-            if (y->getRight()) {
-                y->getRight()->setParent(y);
-            }
+	    if (y->getRight()) {//NEED THIS CHECK TO AVOID SEG FAULT
+	      y->setRight(z->getRight());
+	      y->getRight()->setParent(y);
+	    }
         }
-        
         transplant(head, z, y);
-        y->setLeft(z->getLeft());
-        if (y->getLeft()) {
-            y->getLeft()->setParent(y);
-        }
+        if (y->getLeft()){//NEED THIS CHECK TO AVOID SEG FAULT
+	  y->setLeft(z->getLeft());
+	  y->getLeft()->setParent(y);
+	}
         y->setColor(z->getColor());
     }
-    
     delete z;
 
-    if (!yOriginalColor && x != nullptr) { // If y was black, fix the tree
+    if (!yOriginalColor && fixTree == true) { // If y was black, fix the tree ADDED BOOLEAN INTO IF STATEMENT
         fixDelete(head, x);
-    } else if (!yOriginalColor) {
-        Node* parent = y->getParent();
-        if (parent) {
-            Node* nil = new Node(-1);  
-            nil->setColor(false);     
-            nil->setParent(parent);
-            
-            if (parent->getLeft() == nullptr) {
-                parent->setLeft(nil);
-            } else if (parent->getRight() == nullptr) {
-                parent->setRight(nil);
-            }
-            
-            fixDelete(head, nil);
-            
-            // Clean up the nil node
-            if (parent->getLeft() == nil) {
-                parent->setLeft(nullptr);
-            } else if (parent->getRight() == nil) {
-                parent->setRight(nullptr);
-            }
-            delete nil;
-        }
     }
 
     cout << "Removed " << i << endl;
 }
-
 // replace node u with node v
 void transplant(Node* &head, Node* u, Node* v) {
     if (!u->getParent()) {
         head = v;
-    } else if (u == u->getParent()->getLeft()) {
+    }
+    else if (u == u->getParent()->getLeft()) {
         u->getParent()->setLeft(v);
-    } else {
+    }
+    else {
         u->getParent()->setRight(v);
     }
     if (v) {
@@ -274,9 +270,11 @@ void leftRotate(Node* &head, Node* x) {
     y->setParent(x->getParent());
     if (!x->getParent()) {
         head = y;
-    } else if (x == x->getParent()->getLeft()) {
+    }
+    else if (x == x->getParent()->getLeft()) {
         x->getParent()->setLeft(y);
-    } else {
+    }
+    else {
         x->getParent()->setRight(y);
     }
     y->setLeft(x);
@@ -293,9 +291,11 @@ void rightRotate(Node* &head, Node* y) {
     x->setParent(y->getParent());
     if (!y->getParent()) {
         head = x;
-    } else if (y == y->getParent()->getRight()) {
+    }
+    else if (y == y->getParent()->getRight()) {
         y->getParent()->setRight(x);
-    } else {
+    }
+    else {
         y->getParent()->setLeft(x);
     }
     x->setRight(y);
@@ -311,7 +311,8 @@ void fixInsert(Node* &head, Node* z) {
                 y->setColor(false);
                 z->getParent()->getParent()->setColor(true);
                 z = z->getParent()->getParent();
-            } else { // Uncle is black or null
+            }
+	    else { // Uncle is black or null
                 if (z == z->getParent()->getRight()) { // Case 2: z is right child
                     z = z->getParent();
                     leftRotate(head, z);
@@ -321,14 +322,16 @@ void fixInsert(Node* &head, Node* z) {
                 z->getParent()->getParent()->setColor(true);
                 rightRotate(head, z->getParent()->getParent());
             }
-        } else { // Symmetric case
+        }
+	else { // Symmetric case
             Node* y = z->getParent()->getParent()->getLeft(); // Uncle
             if (y && y->getColor()) {
                 z->getParent()->setColor(false);
                 y->setColor(false);
                 z->getParent()->getParent()->setColor(true);
                 z = z->getParent()->getParent();
-            } else {
+            }
+	    else {
                 if (z == z->getParent()->getLeft()) {
                     z = z->getParent();
                     rightRotate(head, z);
@@ -373,7 +376,8 @@ void fixDelete(Node* &head, Node* x) {
             if (leftBlack && rightBlack) { // Case 2: Siblings children are black
                 w->setColor(true);
                 x = x->getParent();
-            } else {
+            }
+	    else {
                 if (rightBlack) { // Case 3: Right child is black
                     if (w->getLeft()) {
                         w->getLeft()->setColor(false);
@@ -395,7 +399,8 @@ void fixDelete(Node* &head, Node* x) {
                 leftRotate(head, x->getParent());
                 x = head;
             }
-        } else { // Symmetric case
+        }
+	else { // Symmetric case
             Node* w = x->getParent()->getLeft();
             if (!w) {
                 x = x->getParent();
@@ -419,7 +424,8 @@ void fixDelete(Node* &head, Node* x) {
             if (rightBlack && leftBlack) {
                 w->setColor(true);
                 x = x->getParent();
-            } else {
+            }
+	    else {
                 if (leftBlack) {
                     if (w->getRight()) {
                         w->getRight()->setColor(false);
