@@ -163,6 +163,7 @@ bool search(Node* head, int i) {
     }
     return x != nullptr;
 }
+
 // remove a number
 void remove(Node* &head, int i) {
     Node* z = head;
@@ -181,7 +182,7 @@ void remove(Node* &head, int i) {
 
     Node* y = z;
     bool yOriginalColor = y->getColor();
-    Node* x;
+    Node* x = nullptr;
 
     if (!z->hasLeft()) {
         x = z->getRight();
@@ -196,23 +197,54 @@ void remove(Node* &head, int i) {
         }
         yOriginalColor = y->getColor();
         x = y->getRight();
+        
         if (y->getParent() == z) {
-            if (x) x->setParent(y);
+            if (x) {
+                x->setParent(y);
+            }
         } else {
             transplant(head, y, y->getRight());
             y->setRight(z->getRight());
-            y->getRight()->setParent(y);
+            if (y->getRight()) {
+                y->getRight()->setParent(y);
+            }
         }
+        
         transplant(head, z, y);
         y->setLeft(z->getLeft());
-        y->getLeft()->setParent(y);
+        if (y->getLeft()) {
+            y->getLeft()->setParent(y);
+        }
         y->setColor(z->getColor());
     }
-
+    
     delete z;
 
-    if (!yOriginalColor) { // If y was black, fix the tree
+    if (!yOriginalColor && x != nullptr) { // If y was black, fix the tree
         fixDelete(head, x);
+    } else if (!yOriginalColor) {
+        Node* parent = y->getParent();
+        if (parent) {
+            Node* nil = new Node(-1);  
+            nil->setColor(false);     
+            nil->setParent(parent);
+            
+            if (parent->getLeft() == nullptr) {
+                parent->setLeft(nil);
+            } else if (parent->getRight() == nullptr) {
+                parent->setRight(nil);
+            }
+            
+            fixDelete(head, nil);
+            
+            // Clean up the nil node
+            if (parent->getLeft() == nil) {
+                parent->setLeft(nullptr);
+            } else if (parent->getRight() == nil) {
+                parent->setRight(nullptr);
+            }
+            delete nil;
+        }
     }
 
     cout << "Removed " << i << endl;
@@ -312,59 +344,105 @@ void fixInsert(Node* &head, Node* z) {
 
 // fix tree after deletion
 void fixDelete(Node* &head, Node* x) {
-    while (x != head && (!x || !x->getColor())) {
+    while (x != head && (x && !x->getColor())) {
+        if (!x || !x->getParent()) {
+            break;
+        }
+        
         if (x == x->getParent()->getLeft()) {
             Node* w = x->getParent()->getRight(); // Sibling
+            if (!w) {
+                x = x->getParent();
+                continue;
+            }
+            
             if (w->getColor()) { // Case 1: Sibling is red
                 w->setColor(false);
                 x->getParent()->setColor(true);
                 leftRotate(head, x->getParent());
                 w = x->getParent()->getRight();
+                if (!w) {
+                    x = x->getParent();
+                    continue;
+                }
             }
-            if ((!w->getLeft() || !w->getLeft()->getColor()) &&
-                (!w->getRight() || !w->getRight()->getColor())) { // Case 2: Siblings children are black
+            
+            bool leftBlack = (!w->getLeft() || !w->getLeft()->getColor());
+            bool rightBlack = (!w->getRight() || !w->getRight()->getColor());
+            
+            if (leftBlack && rightBlack) { // Case 2: Siblings children are black
                 w->setColor(true);
                 x = x->getParent();
             } else {
-                if (!w->getRight() || !w->getRight()->getColor()) { // Case 3: Right child is black
-                    if (w->getLeft()) w->getLeft()->setColor(false);
+                if (rightBlack) { // Case 3: Right child is black
+                    if (w->getLeft()) {
+                        w->getLeft()->setColor(false);
+                    }
                     w->setColor(true);
                     rightRotate(head, w);
                     w = x->getParent()->getRight();
+                    if (!w) {
+                        x = x->getParent();
+                        continue;
+                    }
                 }
                 // Case 4: Right child is red
                 w->setColor(x->getParent()->getColor());
                 x->getParent()->setColor(false);
-                if (w->getRight()) w->getRight()->setColor(false);
+                if (w->getRight()) {
+                    w->getRight()->setColor(false);
+                }
                 leftRotate(head, x->getParent());
                 x = head;
             }
         } else { // Symmetric case
             Node* w = x->getParent()->getLeft();
+            if (!w) {
+                x = x->getParent();
+                continue;
+            }
+            
             if (w->getColor()) {
                 w->setColor(false);
                 x->getParent()->setColor(true);
                 rightRotate(head, x->getParent());
                 w = x->getParent()->getLeft();
+                if (!w) {
+                    x = x->getParent();
+                    continue;
+                }
             }
-            if ((!w->getRight() || !w->getRight()->getColor()) &&
-                (!w->getLeft() || !w->getLeft()->getColor())) {
+            
+            bool rightBlack = (!w->getRight() || !w->getRight()->getColor());
+            bool leftBlack = (!w->getLeft() || !w->getLeft()->getColor());
+            
+            if (rightBlack && leftBlack) {
                 w->setColor(true);
                 x = x->getParent();
             } else {
-                if (!w->getLeft() || !w->getLeft()->getColor()) {
-                    if (w->getRight()) w->getRight()->setColor(false);
+                if (leftBlack) {
+                    if (w->getRight()) {
+                        w->getRight()->setColor(false);
+                    }
                     w->setColor(true);
                     leftRotate(head, w);
                     w = x->getParent()->getLeft();
+                    if (!w) {
+                        x = x->getParent();
+                        continue;
+                    }
                 }
                 w->setColor(x->getParent()->getColor());
                 x->getParent()->setColor(false);
-                if (w->getLeft()) w->getLeft()->setColor(false);
+                if (w->getLeft()) {
+                    w->getLeft()->setColor(false);
+                }
                 rightRotate(head, x->getParent());
                 x = head;
             }
         }
     }
-    if (x) x->setColor(false);
+    if (x) {
+        x->setColor(false);
+    }
 }
