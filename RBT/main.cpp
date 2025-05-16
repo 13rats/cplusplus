@@ -4,7 +4,7 @@
 #include <string>
 #include "node.h"
 
-using namespace std; // Zach Russell, April 6th 2025, Red Black Tree part 1 project --> boy was this hard to understand (rotation is messed up man idk)
+using namespace std; // Zach Russell, May 16th 2025, Red Black Tree part 2 project --> boy was this hard to understand (rotation is messed up man idk)
 
 void add(Node* &head, int i);
 void read(Node* &head, const string& filename);
@@ -127,10 +127,21 @@ void print(Node* cur, int depth) {
     for (int i = 0; i < depth; i++) {
         cout << "\t";
     }
-    cout << cur->getValue() << (cur->getColor());
+    if (cur->getColor() == true){
+    cout << cur->getValue() << " R";
+    }
+    else{
+      cout << cur->getValue() << " B";
+    }
     if (cur->getParent()) {
-      cout << " [Parent: " << cur->getParent()->getValue() << (cur->getParent()->getValue())"]";
-    } else {
+      if (cur->getParent()->getColor() == true){
+      cout << " [Parent: " << cur->getParent()->getValue() << "]";
+      }
+      else{
+	cout << " [Parent: " << cur->getParent()->getValue() << "]";
+      }
+    }
+    else {
         cout << " [Root]";
     }
     cout << endl;
@@ -305,17 +316,16 @@ void fixDelete(Node* &head, Node* x) {
         if (x == x->getParent()->getLeft()) {
             Node* w = x->getParent()->getRight(); // Sibling
             if (w->getColor()) { // Case 1: Sibling is red
-	        w->setColor(false);
+                w->setColor(false);
                 x->getParent()->setColor(true);
                 leftRotate(head, x->getParent());
-                w = x->getParent()->getRight(); 
+                w = x->getParent()->getRight();
             }
             if ((!w->getLeft() || !w->getLeft()->getColor()) &&
                 (!w->getRight() || !w->getRight()->getColor())) { // Case 2: Siblings children are black
                 w->setColor(true);
                 x = x->getParent();
-            }
-	    else {
+            } else {
                 if (!w->getRight() || !w->getRight()->getColor()) { // Case 3: Right child is black
                     if (w->getLeft()) w->getLeft()->setColor(false);
                     w->setColor(true);
@@ -325,12 +335,36 @@ void fixDelete(Node* &head, Node* x) {
                 // Case 4: Right child is red
                 w->setColor(x->getParent()->getColor());
                 x->getParent()->setColor(false);
-                // NOT DONE COEM BACK
+                if (w->getRight()) w->getRight()->setColor(false);
+                leftRotate(head, x->getParent());
+                x = head;
+            }
+        } else { // Symmetric case
+            Node* w = x->getParent()->getLeft();
+            if (w->getColor()) {
+                w->setColor(false);
+                x->getParent()->setColor(true);
+                rightRotate(head, x->getParent());
+                w = x->getParent()->getLeft();
+            }
+            if ((!w->getRight() || !w->getRight()->getColor()) &&
+                (!w->getLeft() || !w->getLeft()->getColor())) {
+                w->setColor(true);
+                x = x->getParent();
+            } else {
+                if (!w->getLeft() || !w->getLeft()->getColor()) {
+                    if (w->getRight()) w->getRight()->setColor(false);
+                    w->setColor(true);
+                    leftRotate(head, w);
+                    w = x->getParent()->getLeft();
+                }
+                w->setColor(x->getParent()->getColor());
+                x->getParent()->setColor(false);
+                if (w->getLeft()) w->getLeft()->setColor(false);
+                rightRotate(head, x->getParent());
+                x = head;
             }
         }
-	else { // Symmetric case
-	  // TO DO
-
-	}
     }
+    if (x) x->setColor(false);
 }
